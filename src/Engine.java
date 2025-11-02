@@ -1,4 +1,6 @@
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.*;
 import javax.swing.*;
 
@@ -10,21 +12,44 @@ public class Engine extends JPanel{
     Vector camDir = new Vector(0, 0, -100);
     Cube cube;
 
-    public Engine() {
+    boolean debug;
 
+    public Engine() {
+        debug = true;
         objects = new ArrayList<>();
 
         cube = new Cube(0 , 0, 5, Color.ORANGE, 6, 30, 0, 0);
         objects.add(cube);
         repaint();
 
-        new javax.swing.Timer(16, e -> {
+        javax.swing.Timer timer = new javax.swing.Timer(16, e -> {
             cube.yaw += 2;
             cube.pitch += 1;
             cube.roll -= 2;
             cube.faces = cube.generateFaces(6);
             repaint();
-        }).start();
+        });
+        timer.start();
+
+        setFocusable(true);
+        requestFocusInWindow();
+
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                super.keyPressed(e);
+                if (e.getKeyCode() == KeyEvent.VK_SPACE){
+                    if (timer.isRunning())
+                        timer.stop();
+                    else
+                        timer.start();
+                }
+                else if (e.getKeyCode() == KeyEvent.VK_D){
+                    debug = !debug;
+                    repaint();
+                }
+            }
+        });
 
     }
 
@@ -65,24 +90,26 @@ public class Engine extends JPanel{
             g2d.fillPolygon(xPoints, yPoints, face.vertices.size());
             g2d.setColor(Color.black);
             //g2d.drawPolygon(xPoints, yPoints, face.vertices.size());
-
         }
         //DEBUG
-        for (Face face : cube.faces){
-            Point c = project(face.centre);
-            Vector nEnd = Vector.add(face.centre, face.normal.multiply(0.5));
-            Point e = project(nEnd);
-            g2d.setColor(Color.RED);
-            g2d.drawLine(c.x, c.y, e.x, e.y);
-            g2d.setColor(Color.BLUE);
-            g2d.fillOval(e.x, e.y, 5, 5);
+        if (debug){
+            for (Face face : cube.faces){
+                Point c = project(face.centre);
+                Vector nEnd = Vector.add(face.centre, face.normal.multiply(0.5));
+                Point e = project(nEnd);
+                g2d.setColor(Color.RED);
+                g2d.drawLine(c.x, c.y, e.x, e.y);
+                g2d.setColor(Color.BLUE);
+                g2d.fillOval(e.x, e.y, 5, 5);
 
-            Vector viewVector = Vector.subtract(face.centre, camDir);
+                Vector viewVector = Vector.subtract(face.centre, camDir);
 
-            double dot = Vector.dot(viewVector, face.normal);
+                double dot = Vector.dot(viewVector, face.normal);
 
-            g2d.drawString(Double.toString(dot), e.x, e.y);
+                g2d.drawString(Double.toString(dot), e.x, e.y);
+            }
         }
+
 
     }
 

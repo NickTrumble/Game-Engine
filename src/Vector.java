@@ -1,5 +1,5 @@
 public class Vector{
-    //RIGHT - UP - FORWARDS
+    //RIGHT - UP - FORWARDS?? I don't even know anymore
     public double x;
     public double y;
     public double z;

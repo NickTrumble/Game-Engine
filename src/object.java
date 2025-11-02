@@ -18,6 +18,12 @@ public class object{
 
         //faces
     }
+
+    protected Vector generateNormals(Vector[] vertices) {
+        Vector u = Vector.subtract(vertices[1], vertices[0]);
+        Vector v = Vector.subtract(vertices[2], vertices[0]);
+        return Vector.cross(v, u).normalise();
+    }
 }
 
 class Cube extends object{
@@ -39,7 +45,7 @@ class Cube extends object{
         this.faces = generateFaces(width);
     }
 
-    private Vector[] generateVertices(int width){
+    protected Vector[] generateVertices(int width){
         double rad = width / 2.0;
         ArrayList<Vector> vertices = new ArrayList<>();
         /*
@@ -77,17 +83,16 @@ class Cube extends object{
 
     ArrayList<Face> generateFaces(int width){
         ArrayList<Face> faces = new ArrayList<>();
-
         Vector[] vertices = generateVertices(width);
 
         //FACES
         int[][] faceIndices = {
-                {0, 4, 6}, {0, 6, 2},
-                {1, 3, 7}, {1, 7, 5},
-                {0, 2, 3}, {0, 3, 1},
-                {4, 5, 7}, {4, 7, 6},
-                {2, 6, 7}, {2, 7, 3},
-                {0, 1, 5}, {0, 5, 4}
+                {0, 4, 6}, {0, 6, 2},//back
+                {1, 3, 7}, {1, 7, 5},//front
+                {0, 2, 3}, {0, 3, 1},//left
+                {4, 5, 7}, {4, 7, 6},//right
+                {2, 6, 7}, {2, 7, 3},//top
+                {0, 1, 5}, {0, 5, 4}//bottom
         };
 
         Vector[] normals = new Vector[faceIndices.length];
@@ -108,23 +113,8 @@ class Cube extends object{
             vert.add(vertices[faceIndices[i][2]]);
 
             faces.add(new Face(normals[i], vert));
-            //DEBUG
-/*
-
-            Vector faceToCube = Vector.subtract(cubeCentre, faces.get(i).centre);
-            if (Vector.dot(faceToCube, faces.get(i).normal) > 0){
-                faces.get(i).normal = faces.get(i).normal.multiply(-1);
-            }
-*/
-
         }
         return faces;
-    }
-
-    private Vector generateNormals(Vector[] vertices) {
-        Vector u = Vector.subtract(vertices[1], vertices[0]);
-        Vector v = Vector.subtract(vertices[2], vertices[0]);
-        return Vector.cross(v, u).normalise();
     }
 }
 
